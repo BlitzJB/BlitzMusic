@@ -9,11 +9,13 @@ export default function Player() {
     const [playing, setPlaying] = React.useState<boolean>(false);
     const [currentSeek, setCurrentSeek] = React.useState<number>(0);
     const [loopType, setLoopType] = React.useState<"none" | "one" | "all">("none");
+    const [loading, setLoading] = React.useState<boolean>(false);
 
     const audioRef = React.useRef<HTMLAudioElement>(null);
 
     const downloadAndPlayAudio = async (id: string) => {
         try {
+            setLoading(true);
             const backendURL = `https://ytmusic-interactions-rest-microservice.jb2k4.repl.co/download?video_id=${id}`;
 
             const response = await fetch(backendURL);
@@ -25,6 +27,7 @@ export default function Player() {
                 audioRef.current.src = objectURL;  
                 audioRef.current.play();         
             }
+            setLoading(false);
         } catch (error) {
             console.error("Error downloading and playing audio:", error);
         }
@@ -108,7 +111,10 @@ export default function Player() {
     }
 
     return <div className="min-h-screen w-full bg-neutral-900 md:px-24 px-4 pt-6">
-        <audio controls ref={audioRef} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded}></audio>
+        {
+            loading ? <div className="h-48 flex items-center text-neutral-300">Loading...</div> : ""
+        }
+        <audio className="hidden" controls ref={audioRef} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded}></audio>
         <button onClick={handlePausePlay} className="bg-neutral-200 text-black px-4 py-3 rounded-sm m-1">
             {
                 playing ? "Pause" : "Play"
