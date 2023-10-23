@@ -19,7 +19,7 @@ export default function Home() {
                 <title>Delta Music</title>
                 <link rel="icon" href="/deltamusiclogo.svg" />
             </Head>
-            <div className="min-h-screen w-full bg-neutral-900 md:px-24 px-4 pt-6">
+            <div className="h-screen scrollbar-hidden w-full bg-neutral-900 md:px-24 px-4 pt-6">
                 <nav className="h-20 w-full relative flex items-center">
                     <div>
                         <img className="h-16" src="/deltamusiclogo.svg" alt="" />
@@ -64,7 +64,7 @@ const SongCartExplorer: FC<SongCardExplorerProps> = ({ label, songs, authed }) =
     );
 }
 
-interface SearchResult {
+export interface Song {
     id: string
     title: string
     artists: string[]
@@ -77,7 +77,7 @@ interface SearchResult {
 
 const Search = () => {
     const [searchIsFocused, setSearchIsFocused] = useState(false);
-    const [results, setResults] = useState<SearchResult[]>([]);
+    const [results, setResults] = useState<Song[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [query, setQuery] = useState("");
@@ -144,7 +144,7 @@ const Search = () => {
 
 
 interface SongProps {
-    song: SearchResult
+    song: Song
 }
 
 const Song: FC<SongProps> = ({ song }) => {
