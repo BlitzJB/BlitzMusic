@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 
 export default function Player() {
@@ -111,6 +112,10 @@ export default function Player() {
     }
 
     return <div className="min-h-screen w-full bg-neutral-900 md:px-24 px-4 pt-6">
+        <Head>
+            <title>Player | Delta Music</title>
+            <link rel="icon" href="/deltamusiclogo.svg" />
+        </Head>
         {
             loading ? <div className="h-48 flex items-center text-neutral-300">Loading...</div> : ""
         }
