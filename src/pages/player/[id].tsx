@@ -228,7 +228,7 @@ export default function Player() {
             backgroundSize: "auto 100%", 
             backgroundPosition: "right" 
         }} 
-        className="bg-no-repeat bg-center bg-cover flex-grow md:px-24 px-4 pt-6 relative flex flex-col lg:max-w-[70vw]">
+        className="bg-no-repeat bg-center bg-cover flex-grow md:px-20 px-4 pt-6 relative flex flex-col lg:max-w-[70vw]">
             <nav className="h-20 w-full relative flex items-center">
                 <div>
                     <img className="h-16" src="/deltamusiclogo.svg" alt="" />
@@ -239,52 +239,52 @@ export default function Player() {
                 
             </nav>
             <audio className="hidden" controls ref={audioRef} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded}></audio>
-            <div className="text-neutral-200 font-extrabold text-6xl mt-[18vh]">
+            <div className="text-neutral-200 font-extrabold text-5xl mt-[15vh]">
                 {currentSong?.title}
             </div>
-            <div className="text-neutral-300 font-extralight text-2xl mt-2">
+            <div className="text-neutral-300 font-extralight text-xl mt-2">
                 {currentSong?.artists.join(", ")}
             </div>
             <div className="w-full mt-10">
                 <input className="w-full z-10 styled-input opacity-40 hover:opacity-100 transition-opacity" type="range" value={currentSeek} maxLength={100} onChange={handleRangeChange} />
             </div>
             <div className="flex mt-1">
-                <div className="text-neutral-200 text-medium opacity-60">
+                <div className="text-neutral-200 text-sm opacity-60">
                     {convertSecondsToMMSS(currentSeek)}
                 </div>
-                <div className="text-neutral-200 text-medium opacity-60 ml-auto">
+                <div className="text-neutral-200 text-sm opacity-60 ml-auto">
                     {currentSong?.length}
                 </div>
             </div>
-            <div className="z-10 flex items-center mt-6">
-                <button onClick={handlePrevious} disabled={!controlsElabled || currentSong == recommendations![0]} className={`${currentSong == recommendations![0] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity text-2xl text-black h-20 w-20 px-4 rounded-full py-3 mr-4 m-1 z-10 ${inter.className}`}>
+            <div className="z-10 flex items-center mt-4">
+                <button onClick={handlePrevious} disabled={!controlsElabled || currentSong == recommendations![0]} className={`${currentSong == recommendations![0] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity text-2xl text-black h-16 w-16 px-4 rounded-full py-3 mr-4 m-1 z-10 ${inter.className}`}>
                     &lt;-
                 </button>
-                <button disabled={!controlsElabled} onClick={handlePausePlay} className="bg-neutral-200 opacity-20 hover:opacity-100 transition-opacity text-black h-32 w-32 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center">
+                <button disabled={!controlsElabled} onClick={handlePausePlay} className="bg-neutral-200 opacity-20 hover:opacity-100 transition-opacity text-black h-28 w-28 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center">
                     {
-                        playing ? <img className="h-12 w-20" src="/pause.svg" alt="" /> : <img className="h-12 w-12" src="/play.svg" alt="" />
+                        playing ? <img className="h-12 w-12" src="/pause.svg" alt="" /> : <img className="h-12 w-12" src="/play.svg" alt="" />
                     }
                 </button>
-                <button onClick={handleNext} disabled={!controlsElabled || currentSong == recommendations![recommendations!.length -1]} className={`${currentSong == recommendations![recommendations!.length -1] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity text-2xl text-black h-20 w-20 px-4 rounded-full py-3 ml-4 m-1 z-10 ${inter.className}`}>
+                <button onClick={handleNext} disabled={!controlsElabled || currentSong == recommendations![recommendations!.length -1]} className={`${currentSong == recommendations![recommendations!.length -1] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity text-2xl text-black h-16 w-16 px-4 rounded-full py-3 ml-4 m-1 z-10 ${inter.className}`}>
                     -&gt;
                 </button>
             </div>
             <div className="z-10 flex items-center mt-auto mb-6">
-                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 h-20 w-20 m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity`}>
+                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 h-16 w-16 m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity`}>
                     {
-                        loopType === "none" ? <img className="h-8" src="/loop.svg" alt="" /> : loopType === "one" ? <img className="h-8" src="/loopone.svg" alt="" /> : <img className="h-8" src="/loop.svg" alt="" />
+                        loopType === "none" ? <img className="h-6" src="/loop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/loopone.svg" alt="" /> : <img className="h-6" src="/loop.svg" alt="" />
                     }    
                 </button>
-                <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black h-20 w-20 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
-                    <img src="/share.svg" alt="" />
+                <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black h-16 w-16 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
+                    <img className="h-5" src="/share.svg" alt="" />
                 </button>
             </div>
             {/* <img className="absolute right-0 top-0 h-screen" src={currentSong?.thumbnail.large} alt="" /> */}
 
         </div>
-        <div className="lg:w-[30vw] px-4 cursor-pointer border-l border-neutral-600 bg-neutral-900 pt-6 overflow-y-scroll h-screen">
+        <div className="lg:w-[30vw] px-2 cursor-pointer border-l border-neutral-600 bg-neutral-900 pt-6 overflow-y-scroll h-screen">
             <div className="flex mb-6 mt-3">
-                <div className="text-neutral-500 font-bold px-2 text-xl mt-2">Up Next</div>
+                <div className="text-neutral-500 font-bold px-2 text-lg mt-2">Up Next</div>
                 <div className="ml-auto">
                     <img className="h-8 " src="/unautheduser.svg" alt="" />
                 </div>
@@ -310,10 +310,10 @@ const Recommendation: React.FC<RecommendationProps> = ({ song, onClick, currentS
     }
 
     return <div className={`flex items-center m-2 p-2 ${currentSong!.id === song.id ? "border border-neutral-800 bg-neutral-700 bg-opacity-10" : ""}`} onClick={e => { handleClick(song.id); onClick(song.id) }}>
-        <img src={song.thumbnail.large} alt="" className="h-16 w-16" />
+        <img src={song.thumbnail.large} alt="" className="h-14 w-14" />
         <div className="ml-4">
-            <div className="text-neutral-300">{song.title}</div>
-            <div className="text-neutral-500">{song.artists.join(", ")}</div>
+            <div className="text-neutral-300 text-sm">{song.title}</div>
+            <div className="text-neutral-500 text-sm">{song.artists.join(", ")}</div>
         </div>
     </div>
 }

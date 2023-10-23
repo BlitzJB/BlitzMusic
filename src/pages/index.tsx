@@ -19,7 +19,7 @@ export default function Home() {
                 <title>Delta Music</title>
                 <link rel="icon" href="/deltamusiclogo.svg" />
             </Head>
-            <div className="h-screen scrollbar-hidden w-full bg-neutral-900 md:px-24 px-4 pt-6">
+            <div className="h-screen scrollbar-hidden w-full bg-neutral-900 md:px-20 px-4 pt-6">
                 <nav className="h-20 w-full relative flex items-center">
                     <div>
                         <img className="h-16" src="/deltamusiclogo.svg" alt="" />
