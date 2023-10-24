@@ -28,6 +28,8 @@ export default function Player() {
     const [currentSong, setCurrentSong] = React.useState<Song | null>(null);
     const [recommendations, setRecommendations] = React.useState<Song[] | null>([]);
     const [controlsElabled, setControlsEnabled] = React.useState<boolean>(false);
+    const [showSidebar, setShowSidebar] = React.useState<boolean>(false);
+    const [isMobileScreen, setIsMobileScreen] = React.useState<boolean>(false);
 
     const audioRef = React.useRef<HTMLAudioElement>(null);
 
@@ -84,6 +86,13 @@ export default function Player() {
             populateSongAndRecommendations(id as string);
         }
     }, [id]); // this retults in double fetches when clientside routing, but it's fine for now
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const mobileMediaQuery = window.matchMedia("(max-width: 768px)");
+            setIsMobileScreen(mobileMediaQuery.matches);
+        }
+    }, []);
 
     // Update the range input when audio plays
     const handleTimeUpdate = () => {
@@ -217,6 +226,10 @@ export default function Player() {
         }
     }
 
+    const handleQueueSideBarCollapse = () => {
+        setShowSidebar(!showSidebar);
+    }
+
 
     return <div className="flex min-h-screen w-full bg-neutral-900">
         <Head>
@@ -224,11 +237,13 @@ export default function Player() {
             <link rel="icon" href="/deltamusiclogo.svg" />
         </Head>
         <div style={{ 
-            backgroundImage: `linear-gradient(to right, rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,.9), rgba(23,23,23,.7), rgba(23,23,23,0.4)), url("${currentSong?.thumbnail.large}")`, 
-            backgroundSize: "auto 100%", 
-            backgroundPosition: "right" 
+            backgroundImage: isMobileScreen ? `linear-gradient(to top, rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,.9), rgba(23,23,23,.7), rgba(23,23,23,0.4)), url("${currentSong?.thumbnail.large}")` : `linear-gradient(to right, rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,.9), rgba(23,23,23,.7), rgba(23,23,23,0.4)), url("${currentSong?.thumbnail.large}")`, 
+            backgroundSize: isMobileScreen ? "100% auto" : "auto 100%", 
+            backgroundPosition: isMobileScreen ? "top left" : "right",
+            width: isMobileScreen ? "100vw" : "70vw",
+            maxWidth: isMobileScreen ? "100vw" : "70vw",
         }} 
-        className="bg-no-repeat bg-center bg-cover flex-grow md:px-20 px-4 pt-6 relative flex flex-col lg:max-w-[70vw]">
+        className={`bg-no-repeat overflow-hidden bg-center bg-cover flex-grow md:px-20 px-4 pt-6 relative flex flex-col  transition-all`}>
             <nav className="h-20 w-full relative flex items-center">
                 <div>
                     <img className="h-16" src="/deltamusiclogo.svg" alt="" />
@@ -236,13 +251,15 @@ export default function Player() {
                 {
                     (songLoading || recommendationsLoading) && <div style={{ animationDuration: '400ms' }} className="animate-spin border-b border-r h-8 w-8 border-neutral-400 rounded-full ml-4"></div>
                 }
-                
+                <button onClick={handleQueueSideBarCollapse} disabled={!controlsElabled} className={`${isMobileScreen ? "" : "translate-x-[4.5rem] hidden "} ${isMobileScreen && showSidebar ? "hidden" : ""} ml-auto bg-neutral-200 text-black h-16 w-16 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity`}>
+                    <img className="h-6" src="/queue.svg" alt="" />
+                </button>
             </nav>
             <audio className="hidden" controls ref={audioRef} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded}></audio>
-            <div className="text-neutral-200 font-extrabold text-5xl mt-[15vh]">
+            <div className="text-neutral-200 font-extrabold md:text-5xl text-4xl md:mt-[15vh] mt-[18vh]">
                 {currentSong?.title}
             </div>
-            <div className="text-neutral-300 font-extralight text-xl mt-2">
+            <div className="text-neutral-300 font-extralight text-xl mt-3">
                 {currentSong?.artists.join(", ")}
             </div>
             <div className="w-full mt-10">
@@ -256,35 +273,42 @@ export default function Player() {
                     {currentSong?.length}
                 </div>
             </div>
-            <div className="z-10 flex items-center mt-4">
-                <button onClick={handlePrevious} disabled={!controlsElabled || currentSong == recommendations![0]} className={`${currentSong == recommendations![0] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity text-2xl text-black h-16 w-16 px-4 rounded-full py-3 mr-4 m-1 z-10 ${inter.className}`}>
+            <div className=" flex items-center md:mx-0 mx-auto md:mt-4 mt-auto">
+                <button onClick={handlePrevious} disabled={!controlsElabled || currentSong == recommendations![0]} className={`${currentSong == recommendations![0] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity md:text-2xl text-xl text-black md:h-16 md:w-16 h-14 w-14 px-4 rounded-full py-3 mr-4 m-1  ${inter.className}`}>
                     &lt;-
                 </button>
-                <button disabled={!controlsElabled} onClick={handlePausePlay} className="bg-neutral-200 opacity-20 hover:opacity-100 transition-opacity text-black h-28 w-28 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center">
+                <button disabled={!controlsElabled} onClick={handlePausePlay} className="bg-neutral-200 opacity-20 hover:opacity-100 transition-opacity text-black md:h-28 h-20 md:w-28 w-20 px-4 rounded-full py-3  m-1  flex items-center justify-center">
                     {
-                        playing ? <img className="h-12 w-12" src="/pause.svg" alt="" /> : <img className="h-12 w-12" src="/play.svg" alt="" />
+                        playing ? <img className="md:h-12 h-8 md:w-12 w-8" src="/pause.svg" alt="" /> : <img className="md:h-12 h-8 md:w-12 w-8" src="/play.svg" alt="" />
                     }
                 </button>
-                <button onClick={handleNext} disabled={!controlsElabled || currentSong == recommendations![recommendations!.length -1]} className={`${currentSong == recommendations![recommendations!.length -1] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity text-2xl text-black h-16 w-16 px-4 rounded-full py-3 ml-4 m-1 z-10 ${inter.className}`}>
+                <button onClick={handleNext} disabled={!controlsElabled || currentSong == recommendations![recommendations!.length -1]} className={`${currentSong == recommendations![recommendations!.length -1] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity md:text-2xl text-xl text-black md:h-16 md:w-16 h-14 w-14 px-4 rounded-full py-3 ml-4 m-1  ${inter.className}`}>
                     -&gt;
                 </button>
             </div>
-            <div className="z-10 flex items-center mt-auto mb-6">
-                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 h-16 w-16 m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity`}>
+            <div className="z-10 flex items-center md:mt-auto md:mx-0 mx-auto md:mb-6 mb-8">
+                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
                     {
                         loopType === "none" ? <img className="h-6" src="/loop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/loopone.svg" alt="" /> : <img className="h-6" src="/loop.svg" alt="" />
                     }    
                 </button>
-                <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black h-16 w-16 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
+                <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black md:h-16 md:w-16 h-12 w-12 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
                     <img className="h-5" src="/share.svg" alt="" />
                 </button>
             </div>
             {/* <img className="absolute right-0 top-0 h-screen" src={currentSong?.thumbnail.large} alt="" /> */}
 
         </div>
-        <div className="lg:w-[30vw] px-2 cursor-pointer border-l border-neutral-600 bg-neutral-900 pt-6 overflow-y-scroll h-screen">
+        <div className={`lg:w-[30vw] px-2 cursor-pointer border-l border-neutral-600 bg-neutral-900 pt-6 overflow-y-scroll h-screen transition-all ${isMobileScreen ? "absolute scrollbar-hidden top-0 " : ""}`} style={{
+            width: !isMobileScreen ? "30vw" : !showSidebar ? "0vw" : isMobileScreen ? "100vw" : "30vw",
+            maxWidth: !isMobileScreen ? "30vw" : !showSidebar ? "0vw" : isMobileScreen ? "100vw" : "30vw",
+            display: !isMobileScreen ? "block" : !showSidebar ? "none" : "block",
+        }}>
             <div className="flex mb-6 mt-3">
-                <div className="text-neutral-500 font-bold px-2 text-lg mt-2">Up Next</div>
+                <div className="text-neutral-500 font-bold px-2 text-lg mt-2 flex flex-col">
+                    <button className={inter.className + " mr-2 w-fit font-bold text-sm py-3 md:hidden"} onClick={e => setShowSidebar(!showSidebar)}>&lt;- Back</button>
+                    Up Next
+                </div>
                 <div className="ml-auto">
                     <img className="h-8 " src="/unautheduser.svg" alt="" />
                 </div>
