@@ -30,7 +30,6 @@ export default function Player() {
     const [controlsElabled, setControlsEnabled] = React.useState<boolean>(false);
     const [showSidebar, setShowSidebar] = React.useState<boolean>(false);
     const [isMobileScreen, setIsMobileScreen] = React.useState<boolean>(false);
-
     const audioRef = React.useRef<HTMLAudioElement>(null);
 
     const downloadAndPlayAudio = async (id: string) => {
@@ -94,7 +93,46 @@ export default function Player() {
         }
     }, []);
 
-    // Update the range input when audio plays
+    useEffect(() => {
+        if (currentSong && typeof window !== "undefined" && 'mediaSession' in navigator) {
+
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: currentSong.title,
+                artist: currentSong.artists.join(", "),
+                artwork: [
+                    { src: currentSong.thumbnail.large, sizes: "512x512", type: "image/png" },
+                ],
+            });
+
+            navigator.mediaSession.setActionHandler('play', () => {
+                if (audioRef.current) {
+                    audioRef.current.play();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler('pause', () => {
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                }
+            });
+
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+                handlePrevious();
+            });
+
+            navigator.mediaSession.setActionHandler('nexttrack', () => {
+                handleNext();
+            });
+
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                if (audioRef.current) {
+                    audioRef.current.currentTime = details.seekTime ?? 0;
+                }
+            });
+
+        }
+    }, [currentSong]);
+
     const handleTimeUpdate = () => {
         if (audioRef.current) {
             setCurrentSeek(audioRef.current.currentTime);
@@ -102,6 +140,13 @@ export default function Player() {
                 setPlaying(false);
             }
         }
+        if (navigator.mediaSession && navigator.mediaSession.setPositionState) {
+            navigator.mediaSession.setPositionState({
+                duration: audioRef.current!.duration,
+                position: audioRef.current!.currentTime,
+                playbackRate: 1.0
+            });
+        }   
     }
     
     // Set the max value of range input when audio is loaded
