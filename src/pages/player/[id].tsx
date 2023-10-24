@@ -286,13 +286,13 @@ export default function Player() {
                     -&gt;
                 </button>
             </div>
-            <div className="z-10 flex items-center md:mt-auto md:mx-0 mx-auto md:mb-6 mb-8">
-                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
+            <div className=" flex items-center md:mt-auto md:mx-0 mx-auto md:mb-6 mb-8">
+                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
                     {
                         loopType === "none" ? <img className="h-6" src="/loop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/loopone.svg" alt="" /> : <img className="h-6" src="/loop.svg" alt="" />
                     }    
                 </button>
-                <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black md:h-16 md:w-16 h-12 w-12 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
+                <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black md:h-16 md:w-16 h-12 w-12 px-4 rounded-full py-3  m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
                     <img className="h-5" src="/share.svg" alt="" />
                 </button>
             </div>
