@@ -18,6 +18,7 @@ export default function Home() {
             <Head>
                 <title>Delta Music</title>
                 <link rel="icon" href="/deltamusiclogo.svg" />
+                <link rel="manifest" href="/manifest.json" />
             </Head>
             <div className="h-screen scrollbar-hidden w-full bg-neutral-900 md:px-20 px-4 pt-6">
                 <nav className="h-20 w-full relative flex items-center">
