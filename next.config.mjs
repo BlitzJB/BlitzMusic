@@ -4,7 +4,6 @@
  */
 await import("./src/env.mjs");
 
-
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
@@ -20,8 +19,8 @@ const config = {
   },
 
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   }
 };
 
-module.exports = config;
+export default config;

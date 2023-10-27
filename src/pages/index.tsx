@@ -100,7 +100,7 @@ const Search = () => {
                         console.error(error);
                     });
             }
-        }, 200);
+        }, 500);
 
         return () => clearTimeout(delayDebounceFn);
     }, [query]);
@@ -114,7 +114,7 @@ const Search = () => {
             <div className="flex mt-6 mb-8 relative">
                 <input
                     onFocus={() => setSearchIsFocused(true)}
-                    onBlur={() => setTimeout(() => setSearchIsFocused(false), 100)}
+                    onBlur={() => setTimeout(() => setSearchIsFocused(false), 200)}
                     onChange={handleInputChange}
                     className="w-full h-12 px-4 rounded-sm bg-transparent border-neutral-600 border placeholder:text-neutral-500 hover:border-rose-500 focus:border-rose-500 transition-colors hover:placeholder:text-rose-100 focus:placeholder:text-rose-100 focus:text-rose-100 text-neutral-200 outline-none"
                     type="text"
@@ -127,14 +127,14 @@ const Search = () => {
                 </button>
                 <div
                     className={`bg-neutral-800 absolute top-0 mt-14 w-full max-h-[calc(100vh-12rem)] overflow-y-scroll ${(searchIsFocused && query && !loading) ? "block" : "hidden"}`}
-                >
-                    {loading && <div>Loading...</div>}
-                    {error && <div>Error</div>}
+                >   
                     <ul>
+                        {loading && <div>Loading...</div>}
+                        {error && <div>Error</div>}
                         {
                             !loading && !error && (
-                                results.map((result) => <Song song={result} />)
-                            )
+                                results.map((result) => <Song song={result} onClick={e => router.push(`/player/${result.id}`)} />)
+                            ) 
                         }
                     </ul>
                 </div>
@@ -146,6 +146,7 @@ const Search = () => {
 
 interface SongProps {
     song: Song
+    onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
 const Song: FC<SongProps> = ({ song }) => {
@@ -161,21 +162,19 @@ const Song: FC<SongProps> = ({ song }) => {
         }
     }, [visible])
 
-    return <li className={`mb-1 ${visible ? "opacity-1" : "opacity-0"} transition-all cursor-pointer border-t border-b hover:border-opacity-40 border-transparent hover:border-rose-900`} key={song.id} onClick={e => router.push(`/player/${song.id}`)}>
-        <div className="flex items-center">
-            <img
-                className="h-16 w-16 rounded-sm"
-                src={song.thumbnail.mini}
-                alt=""
-            />
-            <div className="ml-4">
-                <div className="text-neutral-300 font-semibold">
-                    {song.title}
-                </div>
-                <div className="text-neutral-500">
-                    {song.artists.join(", ")}
-                </div>
+    return <div onClick={e => router.push(`/player/${song.id}`)} className={`mb-1 ${visible ? "opacity-1" : "opacity-0"} transition-all cursor-pointer border-t border-b hover:border-opacity-40 border-transparent hover:border-rose-900 flex items-center`} key={song.id}>
+        <img
+            className="h-16 w-16 rounded-sm"
+            src={song.thumbnail.mini}
+            alt=""
+        />
+        <div className="ml-4">
+            <div className="text-neutral-300 font-semibold">
+                {song.title}
+            </div>
+            <div className="text-neutral-500">
+                {song.artists.join(", ")}
             </div>
         </div>
-    </li>
+    </div>
 }

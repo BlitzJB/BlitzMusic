@@ -263,7 +263,7 @@ export default function Player() {
         if (typeof window !== "undefined" && navigator.share) {
             navigator.share({
               title: `Share ${currentSong?.title} by ${currentSong?.artists.join(", ")}`,
-              text: "Hey! Listen to this song on Delta Music!",
+              text: `Hey! Listen to ${currentSong?.title} on Delta Music!`,
               url: window.location.href
             })
             .then(() => console.log('Successful share'))
@@ -275,10 +275,9 @@ export default function Player() {
         setShowSidebar(!showSidebar);
     }
 
-
     return <div className="flex min-h-screen w-full bg-neutral-900">
         <Head>
-            <title>Player | Delta Music</title>
+            <title>{currentSong ? `Playing ${currentSong.title}` : "Player | Delta Music"}</title>
             <link rel="icon" href="/deltamusiclogo.svg" />
         </Head>
         <div style={{ 
