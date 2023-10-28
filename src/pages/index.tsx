@@ -114,7 +114,7 @@ const Search = () => {
             <div className="flex mt-6 mb-8 relative">
                 <input
                     onFocus={() => setSearchIsFocused(true)}
-                    onBlur={() => setTimeout(() => setSearchIsFocused(false), 200)}
+                    onBlur={() => {setTimeout(() => setSearchIsFocused(false), 300)}}
                     onChange={handleInputChange}
                     className="w-full h-12 px-4 rounded-sm bg-transparent border-neutral-600 border placeholder:text-neutral-500 hover:border-rose-500 focus:border-rose-500 transition-colors hover:placeholder:text-rose-100 focus:placeholder:text-rose-100 focus:text-rose-100 text-neutral-200 outline-none"
                     type="text"
@@ -133,7 +133,7 @@ const Search = () => {
                         {error && <div>Error</div>}
                         {
                             !loading && !error && (
-                                results.map((result) => <Song song={result} onClick={e => router.push(`/player/${result.id}`)} />)
+                                results.map((result) => <Song song={result} onClick={e => {router.push(`/player/${result.id}`).then(done => done && setSearchIsFocused(false))}} />)
                             ) 
                         }
                     </ul>
