@@ -3,7 +3,7 @@ self.addEventListener('install', (e) => {
         caches.open('my-cache').then((cache) => {
             return cache.addAll([
                 '/',
-                '/manifest.json',
+                '/pwa/manifest.json',
                 // Add other assets you want to cache here.
             ]);
         })

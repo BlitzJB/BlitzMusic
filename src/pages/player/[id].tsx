@@ -30,9 +30,13 @@ export default function Player() {
     const [controlsElabled, setControlsEnabled] = React.useState<boolean>(false);
     const [showSidebar, setShowSidebar] = React.useState<boolean>(false);
     const [isMobileScreen, setIsMobileScreen] = React.useState<boolean>(false);
+    const [currentBlobUrl, setCurrentBlobUrl] = React.useState<string | null>(null);
     const audioRef = React.useRef<HTMLAudioElement>(null);
 
     const downloadAndPlayAudio = async (id: string) => {
+        if (currentBlobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+        }
         try {
             setControlsEnabled(false);
             setSongLoading(true);
@@ -42,6 +46,7 @@ export default function Player() {
             const blob = await response.blob();  
 
             const objectURL = URL.createObjectURL(blob);
+            setCurrentBlobUrl(objectURL);
 
             if (audioRef.current) {
                 audioRef.current.src = objectURL;  
@@ -278,7 +283,7 @@ export default function Player() {
     return <div className="flex min-h-screen w-full bg-neutral-900">
         <Head>
             <title>{currentSong ? `Playing ${currentSong.title}` : "Player | Delta Music"}</title>
-            <link rel="icon" href="/deltamusiclogo.svg" />
+            <link rel="icon" href="/brand/deltamusiclogo.svg" />
         </Head>
         <div style={{ 
             backgroundImage: isMobileScreen ? `linear-gradient(to top, rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,.9), rgba(23,23,23,.7), rgba(23,23,23,0.4)), url("${currentSong?.thumbnail.large}")` : `linear-gradient(to right, rgba(23,23,23,1), rgba(23,23,23,1), rgba(23,23,23,.9), rgba(23,23,23,.7), rgba(23,23,23,0.4)), url("${currentSong?.thumbnail.large}")`, 
@@ -290,13 +295,13 @@ export default function Player() {
         className={`bg-no-repeat overflow-hidden bg-center bg-cover flex-grow md:px-20 px-4 pt-6 relative flex flex-col  transition-all`}>
             <nav className="h-20 w-full relative flex items-center">
                 <div>
-                    <img className="h-16" src="/deltamusiclogo.svg" alt="" />
+                    <img className="h-16" src="/brand/deltamusiclogo.svg" alt="" />
                 </div>
                 {
                     (songLoading || recommendationsLoading) && <div style={{ animationDuration: '400ms' }} className="animate-spin border-b border-r h-8 w-8 border-neutral-400 rounded-full ml-4"></div>
                 }
                 <button onClick={handleQueueSideBarCollapse} disabled={!controlsElabled} className={`${isMobileScreen ? "" : "translate-x-[4.5rem] hidden "} ${isMobileScreen && showSidebar ? "hidden" : ""} ml-auto bg-neutral-200 text-black h-16 w-16 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity`}>
-                    <img className="h-6" src="/queue.svg" alt="" />
+                    <img className="h-6" src="/icons/queue.svg" alt="" />
                 </button>
             </nav>
             <audio className="hidden" controls ref={audioRef} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded}></audio>
@@ -323,7 +328,7 @@ export default function Player() {
                 </button>
                 <button disabled={!controlsElabled} onClick={handlePausePlay} className="bg-neutral-200 opacity-20 hover:opacity-100 transition-opacity text-black md:h-28 h-20 md:w-28 w-20 px-4 rounded-full py-3  m-1  flex items-center justify-center">
                     {
-                        playing ? <img className="md:h-12 h-8 md:w-12 w-8" src="/pause.svg" alt="" /> : <img className="md:h-12 h-8 md:w-12 w-8" src="/play.svg" alt="" />
+                        playing ? <img className="md:h-12 h-8 md:w-12 w-8" src="/icons/pause.svg" alt="" /> : <img className="md:h-12 h-8 md:w-12 w-8" src="/icons/play.svg" alt="" />
                     }
                 </button>
                 <button onClick={handleNext} disabled={!controlsElabled || currentSong == recommendations![recommendations!.length -1]} className={`${currentSong == recommendations![recommendations!.length -1] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity md:text-2xl text-xl text-black md:h-16 md:w-16 h-14 w-14 px-4 rounded-full py-3 ml-4 m-1  ${inter.className}`}>
@@ -333,11 +338,11 @@ export default function Player() {
             <div className=" flex items-center md:mt-auto md:mx-0 mx-auto md:mb-6 mb-8">
                 <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
                     {
-                        loopType === "none" ? <img className="h-6" src="/loop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/loopone.svg" alt="" /> : <img className="h-6" src="/loop.svg" alt="" />
+                        loopType === "none" ? <img className="h-6" src="/icons/loop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/icons/loopone.svg" alt="" /> : <img className="h-6" src="/icons/loop.svg" alt="" />
                     }    
                 </button>
                 <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black md:h-16 md:w-16 h-12 w-12 px-4 rounded-full py-3  m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
-                    <img className="h-5" src="/share.svg" alt="" />
+                    <img className="h-5" src="/icons/share.svg" alt="" />
                 </button>
             </div>
             {/* <img className="absolute right-0 top-0 h-screen" src={currentSong?.thumbnail.large} alt="" /> */}
@@ -354,7 +359,7 @@ export default function Player() {
                     Up Next
                 </div>
                 <div className="ml-auto">
-                    <img className="h-8 " src="/unautheduser.svg" alt="" />
+                    <img className="h-8 " src="/icons/unautheduser.svg" alt="" />
                 </div>
             </div>
             {
