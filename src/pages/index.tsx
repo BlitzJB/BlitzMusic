@@ -17,16 +17,16 @@ export default function Home() {
         <>
             <Head>
                 <title>Delta Music</title>
-                <link rel="icon" href="/deltamusiclogo.svg" />
-                <link rel="manifest" href="/manifest.json" />
+                <link rel="icon" href="/brand/deltamusiclogo.svg" />
+                <link rel="manifest" href="/pwa/manifest.json" />
             </Head>
             <div className="h-screen scrollbar-hidden w-full bg-neutral-900 md:px-20 px-4 pt-6">
                 <nav className="h-20 w-full relative flex items-center">
                     <div>
-                        <img className="h-16" src="/deltamusiclogo.svg" alt="" />
+                        <img className="h-16" src="/brand/deltamusiclogo.svg" alt="" />
                     </div>
                     <div className="ml-auto">
-                        <img className="h-8 " src="/unautheduser.svg" alt="" />
+                        <img className="h-8 " src="/icons/unautheduser.svg" alt="" />
                     </div>
                 </nav>
                 <main className="flex-grow">
