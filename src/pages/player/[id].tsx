@@ -22,7 +22,7 @@ export default function Player() {
 
     const [playing, setPlaying] = React.useState<boolean>(false);
     const [currentSeek, setCurrentSeek] = React.useState<number>(0);
-    const [loopType, setLoopType] = React.useState<"none" | "one" | "all">("none");
+    const [loopType, setLoopType] = React.useState<"none" | "one" | "all">("all");
     const [songLoading, setSongLoading] = React.useState<boolean>(false);
     const [recommendationsLoading, setRecommendationsLoading] = React.useState<boolean>(false);
     const [currentSong, setCurrentSong] = React.useState<Song | null>(null);
@@ -223,7 +223,6 @@ export default function Player() {
                 setLoopType("none");
             }
         }
-        console.log("loop", loopType);
     }
 
     const handleNext = () => {
@@ -336,9 +335,9 @@ export default function Player() {
                 </button>
             </div>
             <div className=" flex items-center md:mt-auto md:mx-0 mx-auto md:mb-6 mb-8">
-                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-500" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
+                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-200" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
                     {
-                        loopType === "none" ? <img className="h-6" src="/icons/loop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/icons/loopone.svg" alt="" /> : <img className="h-6" src="/icons/loop.svg" alt="" />
+                        loopType === "none" ? <img className="h-6" src="/icons/noloop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/icons/loopone.svg" alt="" /> : <img className="h-6" src="/icons/loop.svg" alt="" />
                     }    
                 </button>
                 <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black md:h-16 md:w-16 h-12 w-12 px-4 rounded-full py-3  m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
