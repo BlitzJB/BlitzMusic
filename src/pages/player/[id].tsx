@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { Song } from ".."; 
 import { Inter } from "next/font/google";
-import { set } from "zod";
 
 const inter = Inter({
     display: "swap",
@@ -16,6 +15,12 @@ const convertSecondsToMMSS = (seconds: number) => {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
 }
 
+const convertMMSSToSeconds = (mmss: string) => {
+    const minutes = parseInt(mmss.split(":")[0]!);
+    const seconds = parseInt(mmss.split(":")[1]!);
+    return (minutes * 60) + seconds;
+}
+
 export default function Player() {
     const router = useRouter();
     const { id } = router.query;
@@ -23,37 +28,21 @@ export default function Player() {
     const [playing, setPlaying] = React.useState<boolean>(false);
     const [currentSeek, setCurrentSeek] = React.useState<number>(0);
     const [loopType, setLoopType] = React.useState<"none" | "one" | "all">("all");
-    const [songLoading, setSongLoading] = React.useState<boolean>(false);
     const [recommendationsLoading, setRecommendationsLoading] = React.useState<boolean>(false);
     const [currentSong, setCurrentSong] = React.useState<Song | null>(null);
     const [recommendations, setRecommendations] = React.useState<Song[] | null>([]);
-    const [controlsElabled, setControlsEnabled] = React.useState<boolean>(false);
     const [showSidebar, setShowSidebar] = React.useState<boolean>(false);
     const [isMobileScreen, setIsMobileScreen] = React.useState<boolean>(false);
-    const [currentBlobUrl, setCurrentBlobUrl] = React.useState<string | null>(null);
+    const [audioIsBuffering, setAudioIsBuffering] = React.useState<boolean>(false);
     const audioRef = React.useRef<HTMLAudioElement>(null);
 
     const downloadAndPlayAudio = async (id: string) => {
-        if (currentBlobUrl) {
-            URL.revokeObjectURL(currentBlobUrl);
-        }
         try {
-            setControlsEnabled(false);
-            setSongLoading(true);
             const backendURL = `https://ytmusic-interactions-rest-microservice.jb2k4.repl.co/download?video_id=${id}`;
-
-            const response = await fetch(backendURL);
-            const blob = await response.blob();  
-
-            const objectURL = URL.createObjectURL(blob);
-            setCurrentBlobUrl(objectURL);
-
             if (audioRef.current) {
-                audioRef.current.src = objectURL;  
+                audioRef.current.src = backendURL;  
                 audioRef.current.play();         
             }
-            setSongLoading(false);
-            setControlsEnabled(true);
         } catch (error) {
             console.error("Error downloading and playing audio:", error);
         }
@@ -147,7 +136,7 @@ export default function Player() {
         }
         if (navigator.mediaSession && navigator.mediaSession.setPositionState) {
             navigator.mediaSession.setPositionState({
-                duration: audioRef.current!.duration,
+                duration: convertMMSSToSeconds(currentSong?.length ?? "100:00"),
                 position: audioRef.current!.currentTime,
                 playbackRate: 1.0
             });
@@ -180,7 +169,6 @@ export default function Player() {
                     if (nextSong) {
                         audioRef.current?.pause();
                         setPlaying(false);
-                        setSongLoading(true);
                         downloadAndPlayAudio(nextSong.id);
                         setCurrentSong(nextSong);
                     }
@@ -189,13 +177,20 @@ export default function Player() {
                     if (firstSong) {
                         audioRef.current?.pause();
                         setPlaying(false);
-                        setSongLoading(true);
                         downloadAndPlayAudio(firstSong.id);
                         setCurrentSong(firstSong);
                     }
                 }
             }
         }
+    }
+
+    const onWaiting = () => {
+        setAudioIsBuffering(true);
+    }
+
+    const onPlaying = () => {
+        setAudioIsBuffering(false);
     }
 
     const handlePausePlay = () => {
@@ -232,7 +227,6 @@ export default function Player() {
             if (nextSong) {
                 audioRef.current?.pause();
                 setPlaying(false);
-                setSongLoading(true);
                 downloadAndPlayAudio(nextSong.id);
                 setCurrentSong(nextSong);
             }
@@ -246,7 +240,6 @@ export default function Player() {
             if (previousSong) {
                 audioRef.current?.pause();
                 setPlaying(false);
-                setSongLoading(true);
                 downloadAndPlayAudio(previousSong.id);
                 setCurrentSong(previousSong);
             }
@@ -258,7 +251,6 @@ export default function Player() {
             setPlaying(false);
             audioRef.current?.pause();
         }
-        setSongLoading(true);
         downloadAndPlayAudio(id);
         setCurrentSong(recommendations?.find(song => song.id === id) || null);
     }
@@ -297,13 +289,13 @@ export default function Player() {
                     <img className="h-16" src="/brand/deltamusiclogo.svg" alt="" />
                 </div>
                 {
-                    (songLoading || recommendationsLoading) && <div style={{ animationDuration: '400ms' }} className="animate-spin border-b border-r h-8 w-8 border-neutral-400 rounded-full ml-4"></div>
+                    (audioIsBuffering || recommendationsLoading) && <div style={{ animationDuration: '400ms' }} className="animate-spin border-b border-r h-8 w-8 border-neutral-400 rounded-full ml-4"></div>
                 }
-                <button onClick={handleQueueSideBarCollapse} disabled={!controlsElabled} className={`${isMobileScreen ? "" : "translate-x-[4.5rem] hidden "} ${isMobileScreen && showSidebar ? "hidden" : ""} ml-auto bg-neutral-200 text-black h-16 w-16 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity`}>
+                <button onClick={handleQueueSideBarCollapse} className={`${isMobileScreen ? "" : "translate-x-[4.5rem] hidden "} ${isMobileScreen && showSidebar ? "hidden" : ""} ml-auto bg-neutral-200 text-black h-16 w-16 px-4 rounded-full py-3  m-1 z-10 flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity`}>
                     <img className="h-6" src="/icons/queue.svg" alt="" />
                 </button>
             </nav>
-            <audio className="hidden" controls ref={audioRef} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded}></audio>
+            <audio className="hidden" controls ref={audioRef} onTimeUpdate={handleTimeUpdate} onLoadedMetadata={handleLoadedMetadata} onEnded={handleEnded} onWaiting={onWaiting} onPlaying={onPlaying}></audio>
             <div className="text-neutral-200 font-extrabold md:text-5xl text-4xl md:mt-[15vh] mt-[18vh]">
                 {currentSong?.title}
             </div>
@@ -322,25 +314,25 @@ export default function Player() {
                 </div>
             </div>
             <div className=" flex items-center md:mx-0 mx-auto md:mt-4 mt-auto">
-                <button onClick={handlePrevious} disabled={!controlsElabled || currentSong == recommendations![0]} className={`${currentSong == recommendations![0] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity md:text-2xl text-xl text-black md:h-16 md:w-16 h-14 w-14 px-4 rounded-full py-3 mr-4 m-1  ${inter.className}`}>
+                <button onClick={handlePrevious} disabled={currentSong == recommendations![0]} className={`${currentSong == recommendations![0] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity md:text-2xl text-xl text-black md:h-16 md:w-16 h-14 w-14 px-4 rounded-full py-3 mr-4 m-1  ${inter.className}`}>
                     &lt;-
                 </button>
-                <button disabled={!controlsElabled} onClick={handlePausePlay} className="bg-neutral-200 opacity-20 hover:opacity-100 transition-opacity text-black md:h-28 h-20 md:w-28 w-20 px-4 rounded-full py-3  m-1  flex items-center justify-center">
+                <button onClick={handlePausePlay} className="bg-neutral-200 opacity-20 hover:opacity-100 transition-opacity text-black md:h-28 h-20 md:w-28 w-20 px-4 rounded-full py-3  m-1  flex items-center justify-center">
                     {
                         playing ? <img className="md:h-12 h-8 md:w-12 w-8" src="/icons/pause.svg" alt="" /> : <img className="md:h-12 h-8 md:w-12 w-8" src="/icons/play.svg" alt="" />
                     }
                 </button>
-                <button onClick={handleNext} disabled={!controlsElabled || currentSong == recommendations![recommendations!.length -1]} className={`${currentSong == recommendations![recommendations!.length -1] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity md:text-2xl text-xl text-black md:h-16 md:w-16 h-14 w-14 px-4 rounded-full py-3 ml-4 m-1  ${inter.className}`}>
+                <button onClick={handleNext} disabled={currentSong == recommendations![recommendations!.length -1]} className={`${currentSong == recommendations![recommendations!.length -1] ? "bg-neutral-400 opacity-10" : "bg-neutral-200 opacity-20 hover:opacity-100"} transition-opacity md:text-2xl text-xl text-black md:h-16 md:w-16 h-14 w-14 px-4 rounded-full py-3 ml-4 m-1  ${inter.className}`}>
                     -&gt;
                 </button>
             </div>
             <div className=" flex items-center md:mt-auto md:mx-0 mx-auto md:mb-6 mb-8">
-                <button disabled={!controlsElabled} onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-200" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
+                <button onClick={handleLoop} className={`${loopType === "none" ? "bg-neutral-200" : "bg-neutral-200"} text-black px-4 rounded-full py-3 md:h-16 md:w-16 h-12 w-12 m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity md:mr-0 mr-6`}>
                     {
                         loopType === "none" ? <img className="h-6" src="/icons/noloop.svg" alt="" /> : loopType === "one" ? <img className="h-6" src="/icons/loopone.svg" alt="" /> : <img className="h-6" src="/icons/loop.svg" alt="" />
                     }    
                 </button>
-                <button onClick={handleShare} disabled={!controlsElabled} className="bg-neutral-200 text-black md:h-16 md:w-16 h-12 w-12 px-4 rounded-full py-3  m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
+                <button onClick={handleShare} className="bg-neutral-200 text-black md:h-16 md:w-16 h-12 w-12 px-4 rounded-full py-3  m-1  flex items-center justify-center opacity-20 hover:opacity-100 transition-opacity">
                     <img className="h-5" src="/icons/share.svg" alt="" />
                 </button>
             </div>
