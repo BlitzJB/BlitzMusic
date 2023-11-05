@@ -285,7 +285,7 @@ export default function Player() {
         }} 
         className={`bg-no-repeat overflow-hidden bg-center bg-cover flex-grow md:px-20 px-4 pt-6 relative flex flex-col  transition-all`}>
             <nav className="h-20 w-full relative flex items-center">
-                <div>
+                <div onClick={e => router.push('/')}>
                     <img className="h-16" src="/brand/deltamusiclogo.svg" alt="" />
                 </div>
                 {
